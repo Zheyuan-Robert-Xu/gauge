@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pretty_gauge/pretty_gauge.dart';
+import 'package:pretty_gauge/dial_gauge.dart';
 
 void main() => runApp(const MyApp());
 
@@ -50,61 +51,26 @@ class _MyAppState extends State<MyApp> {
                             style: TextStyle(fontSize: 12)),
                       ),
                     ]),
-                    Row(children: <Widget>[
-                      PrettyGauge(
-                        gaugeSize: 100,
-                        segments: [
-                          GaugeSegment('Low', 20, Colors.blue[200]!),
-                          GaugeSegment('Medium', 40, Colors.blue),
-                          GaugeSegment('High', 40, Colors.blue[800]!),
-                        ],
-                        currentValue: 70,
-                        displayWidget:
-                            const Text('Temp', style: TextStyle(fontSize: 12)),
-                      ),
-                      PrettyGauge(
-                        gaugeSize: 100,
-                        segments: [
-                          GaugeSegment('Critically Low', 10, Colors.red),
-                          GaugeSegment('Low', 20, Colors.orange),
-                          GaugeSegment('Medium', 20, Colors.yellow),
-                          GaugeSegment('High', 50, Colors.green),
-                        ],
-                        currentValue: 45,
-                        needleColor: Colors.blue,
-                        showMarkers: false,
-                        valueWidget: Container(),
-                        displayWidget:
-                            const Text('Fuel', style: TextStyle(fontSize: 12)),
-                      ),
-                      PrettyGauge(
-                        gaugeSize: 100,
-                        minValue: 30,
-                        maxValue: 150,
-                        segments: [
-                          GaugeSegment('Low', 20, Colors.red),
-                          GaugeSegment('Slightly Low', 20, Colors.yellow),
-                          GaugeSegment('Correct', 20, Colors.green),
-                          GaugeSegment('High', 60, Colors.orange),
-                        ],
-                        currentValue: 72,
-                        displayWidget:
-                            const Text('Pulse', style: TextStyle(fontSize: 12)),
-                      ),
-                      PrettyGauge(
-                        minValue: 0,
-                        maxValue: 150,
-                        gaugeSize: 100,
-                        segments: [
-                          GaugeSegment('Good', 80, Colors.green),
-                          GaugeSegment('High', 70, Colors.red),
-                        ],
-                        currentValue: 75,
-                        showMarkers: false,
-                        displayWidget:
-                            const Text('Speed', style: TextStyle(fontSize: 12)),
-                      ),
-                    ])
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: PrettyDial(
+                            minValue: 0,
+                            maxValue: 150,
+                            dialsize: 500,
+                            segments: [
+                              DialSegment('Good', 80, Colors.green),
+                              DialSegment('High', 70, Colors.red),
+                            ],
+                            currentValue: 120,
+                            showMarkers: true,
+                            displayWidget: const Text('Speed',
+                                style: TextStyle(fontSize: 12)),
+                          ),
+                        ),
+                      ],
+                    )
                   ])),
         ));
   }
