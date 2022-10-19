@@ -219,6 +219,74 @@ class _PrettyDialState extends State<PrettyDial> {
     return arcs;
   }
 
+  List<Widget> buildMarker(List<DialSegment> segments) {
+    List<Container> containers = [];
+    double cumulativeSegmentSize = 0.0;
+    double dialSpread = widget.maxValue - widget.minValue;
+
+    //Iterate through the segments collection in reverse order
+    //First paint the arc with the last segment color, then paint multiple arcs in sequence until we reach the first segment
+
+    //Because all these arcs will be painted inside of a Stack, it will overlay to represent the eventual Dial with
+    //multiple segments
+    segments.asMap().forEach((key, value) {
+      print(key);
+      containers.add(
+        Container(
+          height: widget.dialsize * 1.1,
+          width: widget.dialsize,
+          alignment: Alignment.center,
+          child: Transform.rotate(
+            angle: (math.pi / 4),
+            child: ClipPath(
+              clipper: ScaleClipper(),
+              child: Container(
+                width: widget.dialsize * 0.25,
+                height: widget.dialsize * 1.1,
+                color: Colors.orange,
+              ),
+            ),
+          ),
+        ),
+      );
+      cumulativeSegmentSize = cumulativeSegmentSize + value.segmentSize;
+    });
+
+    return containers;
+  }
+
+  List<Widget> buildScaleMarker(List<DialSegment> segments) {
+    List<CustomPaint> arcs = [];
+    double cumulativeSegmentSize = 0.0;
+    double dialSpread = widget.maxValue - widget.minValue;
+
+    //Iterate through the segments collection in reverse order
+    //First paint the arc with the last segment color, then paint multiple arcs in sequence until we reach the first segment
+
+    //Because all these arcs will be painted inside of a Stack, it will overlay to represent the eventual Dial with
+    //multiple segments
+    // segments.asMap().entries.map((entry) {
+    //   int idx = entry.key;
+    //   DialSegment segment = entry.value;
+
+    // });
+    segments.reversed.forEach((segment) {
+      arcs.add(
+        CustomPaint(
+          size: Size(widget.dialsize, widget.dialsize),
+          painter: ArcPainter(
+              startAngle: math.pi,
+              sweepAngle:
+                  ((dialSpread - cumulativeSegmentSize) / dialSpread) * math.pi,
+              color: segment.segmentColor),
+        ),
+      );
+      cumulativeSegmentSize = cumulativeSegmentSize + segment.segmentSize;
+    });
+
+    return arcs;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<DialSegment>? _segments = widget.segments;
@@ -262,6 +330,7 @@ class _PrettyDialState extends State<PrettyDial> {
       child: Stack(
         children: <Widget>[
           ...buildDial(_segments),
+          ...buildMarker(_segments),
           widget.showMarkers
               ? CustomPaint(
                   size: Size(widget.dialsize, widget.dialsize),
@@ -295,6 +364,7 @@ class _PrettyDialState extends State<PrettyDial> {
               ),
             ),
           ),
+
           // marker bar for max value
           Container(
             height: widget.dialsize * 1.1,
