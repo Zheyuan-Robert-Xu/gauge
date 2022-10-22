@@ -229,15 +229,17 @@ class _PrettyDialState extends State<PrettyDial> {
 
     //Because all these arcs will be painted inside of a Stack, it will overlay to represent the eventual Dial with
     //multiple segments
-    segments.asMap().forEach((key, value) {
-      print(key);
+    segments.asMap().forEach((index, value) {
       containers.add(
         Container(
           height: widget.dialsize * 1.1,
           width: widget.dialsize,
           alignment: Alignment.center,
           child: Transform.rotate(
-            angle: (math.pi / 4),
+            angle: (math.pi / 2) +
+                cumulativeSegmentSize /
+                    (widget.maxValue - widget.minValue) *
+                    math.pi,
             child: ClipPath(
               clipper: ScaleClipper(),
               child: Container(
@@ -249,6 +251,46 @@ class _PrettyDialState extends State<PrettyDial> {
           ),
         ),
       );
+
+      containers.add(
+        Container(
+          height: widget.dialsize * 1.1,
+          width: widget.dialsize,
+          alignment: Alignment.center,
+          child: Transform.rotate(
+            angle: (math.pi / 2) +
+                cumulativeSegmentSize /
+                    (widget.maxValue - widget.minValue) *
+                    math.pi,
+            child: ClipPath(
+                clipper: ScaleClipper(),
+                child: CustomPaint(
+                    size: Size(widget.dialsize, widget.dialsize),
+                    painter: DialMarkerPainter(
+                        cumulativeSegmentSize.toString(),
+                        Offset(widget.dialsize * 0.23, widget.dialsize * 0.49),
+                        widget.startMarkerStyle))),
+          ),
+        ),
+      );
+      if (index != segments.length - 1) {
+        containers.add(
+          Container(
+            child: Transform.rotate(
+              angle: math.pi *
+                  value.segmentSize /
+                  (widget.maxValue - widget.minValue),
+              child: CustomPaint(
+                  size: Size(widget.dialsize, widget.dialsize),
+                  painter: DialMarkerPainter(
+                      (cumulativeSegmentSize + value.segmentSize).toString(),
+                      Offset(widget.dialsize * 0.23, widget.dialsize * 0.49),
+                      widget.startMarkerStyle)),
+            ),
+          ),
+        );
+      }
+
       cumulativeSegmentSize = cumulativeSegmentSize + value.segmentSize;
     });
 
@@ -331,6 +373,7 @@ class _PrettyDialState extends State<PrettyDial> {
         children: <Widget>[
           ...buildDial(_segments),
           ...buildMarker(_segments),
+
           widget.showMarkers
               ? CustomPaint(
                   size: Size(widget.dialsize, widget.dialsize),
@@ -347,6 +390,25 @@ class _PrettyDialState extends State<PrettyDial> {
                       Offset(widget.dialsize * 0.73, widget.dialsize * 0.49),
                       widget.endMarkerStyle))
               : Container(),
+
+          // marker bar for intermediate value
+          Container(
+            height: widget.dialsize * 1.1,
+            width: widget.dialsize,
+            alignment: Alignment.center,
+            child: Transform.rotate(
+              angle: (math.pi / 2),
+              child: ClipPath(
+                clipper: ScaleClipper(),
+                child: Container(
+                  width: widget.dialsize * 0.25,
+                  height: widget.dialsize * 1.1,
+                  color: Colors.orange,
+                ),
+              ),
+            ),
+          ),
+
           // marker bar for minimal value
           Container(
             height: widget.dialsize * 1.1,
