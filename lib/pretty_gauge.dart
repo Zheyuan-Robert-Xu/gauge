@@ -2,8 +2,6 @@ library pretty_gauge;
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 
 ///Class that holds the details of each segment on a CustomGauge
 class GaugeSegment {
@@ -164,8 +162,8 @@ class PrettyGauge extends StatefulWidget {
       this.displayWidget,
       this.showMarkers = true,
       this.startMarkerStyle =
-          const TextStyle(fontSize: 10, color: Colors.black),
-      this.endMarkerStyle = const TextStyle(fontSize: 10, color: Colors.black)})
+          const TextStyle(fontSize: 15, color: Colors.black),
+      this.endMarkerStyle = const TextStyle(fontSize: 15, color: Colors.black)})
       : super(key: key);
 }
 
@@ -216,9 +214,9 @@ class _PrettyGaugeState extends State<PrettyGauge> {
     if (_currentValueDecimalPlaces < 0) {
       _currentValueDecimalPlaces = 0;
     }
-     if (_currentValueDecimalPlaces > 20) {
+    if (_currentValueDecimalPlaces > 20) {
       _currentValueDecimalPlaces = 20;
-    }   
+    }
 
     //If segments is supplied, validate that the sum of all segment sizes = (maxValue - minValue)
     if (_segments != null) {
@@ -290,7 +288,7 @@ class _PrettyGaugeState extends State<PrettyGauge> {
                 widget.valueWidget ??
                     Text(
                         '${_currentValue.toStringAsFixed(_currentValueDecimalPlaces)}',
-                        style: const TextStyle(fontSize: 10)),
+                        style: const TextStyle(fontSize: 20)),
               ],
             ),
           ),

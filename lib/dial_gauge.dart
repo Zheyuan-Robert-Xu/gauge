@@ -172,9 +172,9 @@ class PrettyDial extends StatefulWidget {
 
   const PrettyDial(
       {Key? key,
-      this.dialsize = 200,
+      this.dialsize = 200.0,
       this.segments,
-      this.minValue = 0,
+      this.minValue = 0.0,
       this.maxValue = 100.0,
       this.currentValue,
       this.currentValueDecimalPlaces = 1,
@@ -184,8 +184,8 @@ class PrettyDial extends StatefulWidget {
       this.displayWidget,
       this.showMarkers = true,
       this.startMarkerStyle =
-          const TextStyle(fontSize: 10, color: Colors.black),
-      this.endMarkerStyle = const TextStyle(fontSize: 10, color: Colors.black)})
+          const TextStyle(fontSize: 15, color: Colors.black),
+      this.endMarkerStyle = const TextStyle(fontSize: 15, color: Colors.black)})
       : super(key: key);
 }
 
@@ -277,8 +277,9 @@ class _PrettyDialState extends State<PrettyDial> {
         containers.add(
           Container(
             child: Transform.rotate(
+              // add 1 in angle to improve the layout
               angle: math.pi *
-                  value.segmentSize /
+                  (cumulativeSegmentSize + value.segmentSize + 1) /
                   (widget.maxValue - widget.minValue),
               child: CustomPaint(
                   size: Size(widget.dialsize, widget.dialsize),
@@ -368,7 +369,7 @@ class _PrettyDialState extends State<PrettyDial> {
 
     return SizedBox(
       height: widget.dialsize,
-      width: widget.dialsize * 1.1,
+      width: widget.dialsize,
       child: Stack(
         children: <Widget>[
           ...buildDial(_segments),
@@ -379,7 +380,7 @@ class _PrettyDialState extends State<PrettyDial> {
                   size: Size(widget.dialsize, widget.dialsize),
                   painter: DialMarkerPainter(
                       widget.minValue.toString(),
-                      Offset(widget.dialsize * 0.23, widget.dialsize * 0.49),
+                      Offset(widget.dialsize * 0.23, widget.dialsize * 0.48),
                       widget.startMarkerStyle))
               : Container(),
           widget.showMarkers
@@ -387,7 +388,7 @@ class _PrettyDialState extends State<PrettyDial> {
                   size: Size(widget.dialsize, widget.dialsize),
                   painter: DialMarkerPainter(
                       widget.maxValue.toString(),
-                      Offset(widget.dialsize * 0.73, widget.dialsize * 0.49),
+                      Offset(widget.dialsize * 0.72, widget.dialsize * 0.48),
                       widget.endMarkerStyle))
               : Container(),
 
@@ -474,7 +475,7 @@ class _PrettyDialState extends State<PrettyDial> {
                 widget.valueWidget ??
                     Text(
                         '${_currentValue.toStringAsFixed(_currentValueDecimalPlaces)}',
-                        style: const TextStyle(fontSize: 10)),
+                        style: const TextStyle(fontSize: 15)),
               ],
             ),
           ),
