@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pretty_gauge/pretty_gauge.dart';
 import 'package:pretty_gauge/dial_gauge.dart';
+import 'package:pretty_gauge/dial_gauge_new.dart';
 
 void main() => runApp(const MyApp());
 
@@ -51,18 +52,39 @@ class _MyAppState extends State<MyApp> {
                             style: TextStyle(fontSize: 12)),
                       ),
                     ]),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     Container(
+                    //       child: PrettyDial(
+                    //         minValue: 0,
+                    //         maxValue: 150,
+                    //         dialsize: 500,
+                    //         segments: [
+                    //           DialSegment('Good', 40, Colors.green),
+                    //           DialSegment('Good', 30, Colors.blue),
+                    //           DialSegment('High', 80, Colors.red),
+                    //         ],
+                    //         currentValue: 90,
+                    //         showMarkers: true,
+                    //         displayWidget: const Text('Current Speed',
+                    //             style: TextStyle(fontSize: 16)),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          child: PrettyDial(
+                          child: PrettyDialNew(
                             minValue: 0,
                             maxValue: 150,
                             dialsize: 500,
                             segments: [
-                              DialSegment('Good', 40, Colors.green),
-                              DialSegment('Good', 30, Colors.blue),
-                              DialSegment('High', 80, Colors.red),
+                              DialSegmentNew('Good', 40, Colors.green),
+                              DialSegmentNew('Good', 30, Colors.blue),
+                              DialSegmentNew('High', 80, Colors.red),
                             ],
                             currentValue: 90,
                             showMarkers: true,
