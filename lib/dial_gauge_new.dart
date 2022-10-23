@@ -27,10 +27,10 @@ class DialNeedleClipperNew extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    path.moveTo(size.width * 0.5, size.height * 0.62);
-    path.lineTo(1.05 * size.width * 0.5, size.height * 0.62);
+    path.moveTo(size.width * 0.5, size.height * 0.1);
+    path.lineTo(1.05 * size.width * 0.5, size.height * 0.1);
     path.lineTo(size.width * 0.5, size.height * 0.95);
-    path.lineTo(0.95 * size.width * 0.5, size.height * 0.62);
+    path.lineTo(0.95 * size.width * 0.5, size.height * 0.1);
     path.close();
     return path;
   }
@@ -46,12 +46,12 @@ class ScaleClipperNew extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    path.moveTo(size.width * 0.5, size.height * 0.78);
-    path.lineTo(1.05 * size.width * 0.5, size.height * 0.78);
-    path.lineTo(1.05 * size.width * 0.5, size.height);
-    path.lineTo(0.95 * size.width * 0.5, size.height);
-    path.lineTo(0.95 * size.width * 0.5, size.height * 0.78);
-    path.close();
+    // path.moveTo(size.width, -size.height);
+    // path.lineTo(size.width * 0.5, size.height);
+    // path.lineTo(size.width * 0.5, size.height);
+    // path.lineTo(size.width, size.height);
+    // path.lineTo(size.width, size.height);
+    // path.close();
     return path;
   }
 
@@ -71,8 +71,11 @@ class ArcPainterNew extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final rect = Rect.fromLTRB(size.width * 0.1, size.height * 0.1,
-        size.width * 0.9, size.height * 0.9);
+    // final rect = Rect.fromLTRB(size.width * 0.1, size.height * 0.1,
+    //     size.width * 0.9, size.height * 0.9);
+
+    final rect = Rect.fromCircle(
+        center: size.bottomCenter(Offset.zero), radius: size.shortestSide);
 
     const useCenter = false;
 
@@ -205,7 +208,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     segments.reversed.forEach((segment) {
       arcs.add(
         CustomPaint(
-          size: Size(widget.dialsize, widget.dialsize),
+          size: Size(widget.dialsize, widget.dialsize / 2),
           painter: ArcPainterNew(
               startAngle: math.pi,
               sweepAngle:
@@ -232,7 +235,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     segments.asMap().forEach((index, value) {
       containers.add(
         Container(
-          height: widget.dialsize * 1.1,
+          height: widget.dialsize / 2,
           width: widget.dialsize,
           alignment: Alignment.center,
           child: Transform.rotate(
@@ -254,7 +257,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
 
       containers.add(
         Container(
-          height: widget.dialsize * 1.1,
+          height: widget.dialsize / 2,
           width: widget.dialsize,
           alignment: Alignment.center,
           child: Transform.rotate(
@@ -368,7 +371,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     }
 
     return SizedBox(
-      height: widget.dialsize,
+      height: widget.dialsize / 2,
       width: widget.dialsize,
       child: Stack(
         children: <Widget>[
@@ -394,7 +397,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
 
           // marker bar for intermediate value
           Container(
-            height: widget.dialsize * 1.1,
+            height: widget.dialsize / 2,
             width: widget.dialsize,
             alignment: Alignment.center,
             child: Transform.rotate(
@@ -412,7 +415,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
 
           // marker bar for minimal value
           Container(
-            height: widget.dialsize * 1.1,
+            height: widget.dialsize / 2,
             width: widget.dialsize,
             alignment: Alignment.center,
             child: Transform.rotate(
@@ -430,7 +433,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
 
           // marker bar for max value
           Container(
-            height: widget.dialsize * 1.1,
+            height: widget.dialsize / 2,
             width: widget.dialsize,
             alignment: Alignment.center,
             child: Transform.rotate(
@@ -446,11 +449,12 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
             ),
           ),
           Container(
-            height: widget.dialsize,
+            height: widget.dialsize / 2,
             width: widget.dialsize,
             alignment: Alignment.center,
             child: Transform.rotate(
-              angle: (math.pi / 2) +
+              origin: Offset(0, widget.dialsize / 4),
+              angle: (math.pi * 3 / 2) +
                   ((_currentValue! - widget.minValue) /
                       (widget.maxValue - widget.minValue) *
                       math.pi),
@@ -465,7 +469,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
             ),
           ),
           Container(
-            height: widget.dialsize,
+            height: widget.dialsize / 2,
             width: widget.dialsize,
             alignment: Alignment.center,
             child: Column(
