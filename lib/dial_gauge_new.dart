@@ -123,6 +123,39 @@ class DialMarkerPainterNew extends CustomPainter {
   }
 }
 
+class DialMarkerPainterAngle extends CustomPainter {
+  DialMarkerPainterAngle(
+      this.text, this.position, this.textStyle, this.rotateAngle);
+
+  final String text;
+  final TextStyle textStyle;
+  final Offset position;
+  final double rotateAngle;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final textSpan = TextSpan(
+      text: text,
+      style: textStyle,
+    );
+    final textPainter = TextPainter(
+      text: textSpan,
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout(
+      minWidth: 0,
+      maxWidth: size.width,
+    );
+    // canvas.rotate(math.pi * 0.05);
+    textPainter.paint(canvas, position);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter old) {
+    return false;
+  }
+}
+
 ///Customizable Dial widget for Flutter
 class PrettyDialNew extends StatefulWidget {
   ///Size of the widget - This widget is rendered in a square shape
@@ -225,7 +258,6 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
   List<Widget> buildMarker(List<DialSegmentNew> segments) {
     List<Container> containers = [];
     double cumulativeSegmentSize = 0.0;
-    double dialSpread = widget.maxValue - widget.minValue;
 
     //Iterate through the segments collection in reverse order
     //First paint the arc with the last segment color, then paint multiple arcs in sequence until we reach the first segment
@@ -255,40 +287,73 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
         ),
       );
 
-      containers.add(
-        Container(
-          height: widget.dialsize / 2,
-          width: widget.dialsize,
-          alignment: Alignment.center,
-          child: Transform.rotate(
-            angle: (math.pi / 2) +
-                cumulativeSegmentSize /
-                    (widget.maxValue - widget.minValue) *
-                    math.pi,
-            child: ClipPath(
-                clipper: ScaleClipperNew(),
-                child: CustomPaint(
-                    size: Size(widget.dialsize, widget.dialsize),
-                    painter: DialMarkerPainterNew(
-                        cumulativeSegmentSize.toString(),
-                        Offset(widget.dialsize * 0.23, widget.dialsize * 0.49),
-                        widget.startMarkerStyle))),
-          ),
-        ),
-      );
+      cumulativeSegmentSize = cumulativeSegmentSize + value.segmentSize;
+    });
+
+    return containers;
+  }
+
+  List<Widget> buildScalerMarker(double minValue, double maxValue) {
+    List<Widget> containers = [];
+    int startMarker = (minValue / 10).floor() * 10;
+    int endMarker = (maxValue / 10).ceil() * 10;
+
+    // for (int i = startMarker; i <= endMarker; i += 10) {
+    //   containers.add(Transform.rotate(
+    //     origin: Offset(0, widget.dialsize / 4),
+    //     angle: ((i - startMarker) / 10) *
+    //         math.pi /
+    //         ((endMarker - startMarker) / 10 + 1),
+    //     child: CustomPaint(
+    //         size: Size(widget.dialsize, widget.dialsize),
+    //         painter: DialMarkerPainterAngle(
+    //             i.toString(),
+    //             Offset(widget.dialsize * 0.12, widget.dialsize * 0.475),
+    //             widget.startMarkerStyle,
+    //             math.pi / ((endMarker - startMarker) / 10))),
+    //   ));
+    // }
+
+    for (int i = startMarker; i <= endMarker; i += 10) {
+      containers.add(CustomPaint(
+          size: Size(widget.dialsize, widget.dialsize),
+          painter: DialMarkerPainterNew(
+              i.toString(),
+              Offset(
+                  widget.dialsize *
+                      (0.475 -
+                          0.35 *
+                              math.cos(math.pi / 15 * (i - startMarker) / 10)),
+                  widget.dialsize *
+                      (0.475 -
+                          0.35 *
+                              math.sin(math.pi / 15 * (i - startMarker) / 10))),
+              widget.startMarkerStyle)));
+    }
+
+    return containers;
+  }
+
+  List<Widget> buildDigitalDial(List<DialSegmentNew> segments) {
+    List<Container> containers = [];
+    double cumulativeSegmentSize = 0.0;
+
+    segments.reversed.toList().asMap().forEach((index, value) {
       if (index != segments.length - 1) {
         containers.add(
           Container(
             child: Transform.rotate(
+              origin: Offset(0, widget.dialsize),
               // add 1 in angle to improve the layout
-              angle: math.pi *
-                  (cumulativeSegmentSize + value.segmentSize + 1) /
-                  (widget.maxValue - widget.minValue),
+              angle: -math.pi / 2 +
+                  math.pi *
+                      (cumulativeSegmentSize + value.segmentSize) /
+                      (widget.maxValue - widget.minValue),
               child: CustomPaint(
-                  size: Size(widget.dialsize, widget.dialsize),
+                  size: Size(widget.dialsize, widget.dialsize / 2),
                   painter: DialMarkerPainterNew(
                       (cumulativeSegmentSize + value.segmentSize).toString(),
-                      Offset(widget.dialsize * 0.23, widget.dialsize * 0.49),
+                      Offset(0, 0),
                       widget.startMarkerStyle)),
             ),
           ),
@@ -297,7 +362,6 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
 
       cumulativeSegmentSize = cumulativeSegmentSize + value.segmentSize;
     });
-
     return containers;
   }
 
@@ -378,22 +442,22 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
           ...buildDial(_segments),
           ...buildMarker(_segments),
 
-          widget.showMarkers
-              ? CustomPaint(
-                  size: Size(widget.dialsize, widget.dialsize),
-                  painter: DialMarkerPainterNew(
-                      widget.minValue.toString(),
-                      Offset(widget.dialsize * 0.15, widget.dialsize * 0.475),
-                      widget.startMarkerStyle))
-              : Container(),
-          widget.showMarkers
-              ? CustomPaint(
-                  size: Size(widget.dialsize, widget.dialsize),
-                  painter: DialMarkerPainterNew(
-                      widget.maxValue.toString(),
-                      Offset(widget.dialsize * 0.8, widget.dialsize * 0.475),
-                      widget.endMarkerStyle))
-              : Container(),
+          // widget.showMarkers
+          //     ? CustomPaint(
+          //         size: Size(widget.dialsize, widget.dialsize),
+          //         painter: DialMarkerPainterNew(
+          //             widget.minValue.toString(),
+          //             Offset(widget.dialsize * 0.12, widget.dialsize * 0.475),
+          //             widget.startMarkerStyle))
+          //     : Container(),
+          // widget.showMarkers
+          //     ? CustomPaint(
+          //         size: Size(widget.dialsize, widget.dialsize),
+          //         painter: DialMarkerPainterNew(
+          //             widget.maxValue.toString(),
+          //             Offset(widget.dialsize * 0.83, widget.dialsize * 0.475),
+          //             widget.endMarkerStyle))
+          //     : Container(),
 
           // marker bar for intermediate value
           Container(
@@ -486,6 +550,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
               ],
             ),
           ),
+          ...buildScalerMarker(0, 150),
         ],
       ),
     );

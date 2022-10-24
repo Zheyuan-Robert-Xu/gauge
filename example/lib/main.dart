@@ -82,9 +82,12 @@ class _MyAppState extends State<MyApp> {
                             maxValue: 150,
                             dialsize: 500,
                             segments: [
-                              DialSegmentNew('Good', 40, Colors.green),
-                              DialSegmentNew('Good', 30, Colors.blue),
-                              DialSegmentNew('High', 80, Colors.red),
+                              DialSegmentNew('Zero', 0, Colors.green),
+                              DialSegmentNew('Good', 70, Colors.blue),
+                              DialSegmentNew('Good', 30, Colors.orange),
+                              DialSegmentNew('High', 50, Colors.red),
+                              DialSegmentNew('High', 0, Colors.red),
+
                             ],
                             currentValue: 75,
                             showMarkers: true,
