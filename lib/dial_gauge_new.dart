@@ -27,10 +27,10 @@ class DialNeedleClipperNew extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    path.moveTo(size.width * 0.5, size.height * 0.1);
-    path.lineTo(1.05 * size.width * 0.5, size.height * 0.1);
-    path.lineTo(size.width * 0.5, size.height * 0.95);
-    path.lineTo(0.95 * size.width * 0.5, size.height * 0.1);
+    path.moveTo(size.width * 0.5, size.height * 0.7);
+    path.lineTo(1.05 * size.width * 0.5, size.height * 0.7);
+    path.lineTo(size.width * 0.5, 0);
+    path.lineTo(0.95 * size.width * 0.5, size.height * 0.7);
     path.close();
     return path;
   }
@@ -371,7 +371,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     }
 
     return SizedBox(
-      height: widget.dialsize / 2,
+      height: widget.dialsize * 0.55,
       width: widget.dialsize,
       child: Stack(
         children: <Widget>[
@@ -383,7 +383,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
                   size: Size(widget.dialsize, widget.dialsize),
                   painter: DialMarkerPainterNew(
                       widget.minValue.toString(),
-                      Offset(widget.dialsize * 0.23, widget.dialsize * 0.48),
+                      Offset(widget.dialsize * 0.15, widget.dialsize * 0.475),
                       widget.startMarkerStyle))
               : Container(),
           widget.showMarkers
@@ -391,7 +391,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
                   size: Size(widget.dialsize, widget.dialsize),
                   painter: DialMarkerPainterNew(
                       widget.maxValue.toString(),
-                      Offset(widget.dialsize * 0.72, widget.dialsize * 0.48),
+                      Offset(widget.dialsize * 0.8, widget.dialsize * 0.475),
                       widget.endMarkerStyle))
               : Container(),
 
@@ -469,12 +469,15 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
             ),
           ),
           Container(
-            height: widget.dialsize / 2,
+            height: widget.dialsize,
             width: widget.dialsize,
-            alignment: Alignment.center,
+            alignment: Alignment.bottomCenter,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                SizedBox(
+                  height: widget.dialsize * 0.44,
+                ),
                 widget.displayWidget ?? Container(),
                 widget.valueWidget ??
                     Text(
