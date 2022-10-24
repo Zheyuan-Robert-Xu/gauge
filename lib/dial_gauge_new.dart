@@ -175,6 +175,9 @@ class PrettyDialNew extends StatefulWidget {
   ///Supply a max value for the Dial. Defaults to 100
   final double maxValue;
 
+  /// value of interval between two markers
+  final int interval;
+
   ///Current value of the Dial
   final double? currentValue;
 
@@ -212,6 +215,7 @@ class PrettyDialNew extends StatefulWidget {
       this.segments,
       this.minValue = 0.0,
       this.maxValue = 100.0,
+      this.interval = 10,
       this.currentValue,
       this.currentValueDecimalPlaces = 1,
       this.needleColor = Colors.black,
@@ -295,26 +299,10 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
 
   List<Widget> buildScalerMarker(double minValue, double maxValue) {
     List<Widget> containers = [];
-    int startMarker = (minValue / 10).floor() * 10;
-    int endMarker = (maxValue / 10).ceil() * 10;
+    int startMarker = (minValue / widget.interval).floor() * widget.interval;
+    int endMarker = (maxValue / widget.interval).ceil() * widget.interval;
 
-    // for (int i = startMarker; i <= endMarker; i += 10) {
-    //   containers.add(Transform.rotate(
-    //     origin: Offset(0, widget.dialsize / 4),
-    //     angle: ((i - startMarker) / 10) *
-    //         math.pi /
-    //         ((endMarker - startMarker) / 10 + 1),
-    //     child: CustomPaint(
-    //         size: Size(widget.dialsize, widget.dialsize),
-    //         painter: DialMarkerPainterAngle(
-    //             i.toString(),
-    //             Offset(widget.dialsize * 0.12, widget.dialsize * 0.475),
-    //             widget.startMarkerStyle,
-    //             math.pi / ((endMarker - startMarker) / 10))),
-    //   ));
-    // }
-
-    for (int i = startMarker; i <= endMarker; i += 10) {
+    for (int i = startMarker; i <= endMarker; i += widget.interval) {
       containers.add(CustomPaint(
           size: Size(widget.dialsize, widget.dialsize),
           painter: DialMarkerPainterNew(
@@ -323,11 +311,19 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
                   widget.dialsize *
                       (0.475 -
                           0.35 *
-                              math.cos(math.pi / 15 * (i - startMarker) / 10)),
+                              math.cos(math.pi /
+                                  ((widget.maxValue - widget.minValue) /
+                                      widget.interval) *
+                                  (i - startMarker) /
+                                  widget.interval)),
                   widget.dialsize *
                       (0.475 -
                           0.35 *
-                              math.sin(math.pi / 15 * (i - startMarker) / 10))),
+                              math.sin(math.pi /
+                                  ((widget.maxValue - widget.minValue) /
+                                      widget.interval) *
+                                  (i - startMarker) /
+                                  widget.interval))),
               widget.startMarkerStyle)));
     }
 
@@ -441,23 +437,6 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
         children: <Widget>[
           ...buildDial(_segments),
           ...buildMarker(_segments),
-
-          // widget.showMarkers
-          //     ? CustomPaint(
-          //         size: Size(widget.dialsize, widget.dialsize),
-          //         painter: DialMarkerPainterNew(
-          //             widget.minValue.toString(),
-          //             Offset(widget.dialsize * 0.12, widget.dialsize * 0.475),
-          //             widget.startMarkerStyle))
-          //     : Container(),
-          // widget.showMarkers
-          //     ? CustomPaint(
-          //         size: Size(widget.dialsize, widget.dialsize),
-          //         painter: DialMarkerPainterNew(
-          //             widget.maxValue.toString(),
-          //             Offset(widget.dialsize * 0.83, widget.dialsize * 0.475),
-          //             widget.endMarkerStyle))
-          //     : Container(),
 
           // marker bar for intermediate value
           Container(

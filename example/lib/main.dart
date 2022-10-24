@@ -80,6 +80,7 @@ class _MyAppState extends State<MyApp> {
                           child: PrettyDialNew(
                             minValue: 0,
                             maxValue: 150,
+                            interval: 10,
                             dialsize: 500,
                             segments: [
                               DialSegmentNew('Zero', 0, Colors.green),
@@ -87,9 +88,8 @@ class _MyAppState extends State<MyApp> {
                               DialSegmentNew('Good', 30, Colors.orange),
                               DialSegmentNew('High', 50, Colors.red),
                               DialSegmentNew('High', 0, Colors.red),
-
                             ],
-                            currentValue: 75,
+                            currentValue: 80,
                             showMarkers: true,
                             displayWidget: const Text('Current Speed',
                                 style: TextStyle(fontSize: 16)),
