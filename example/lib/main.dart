@@ -78,12 +78,12 @@ class _MyAppState extends State<MyApp> {
                       children: [
                         Container(
                           child: PrettyDialNew(
-                            minValue: 0,
+                            minValue: 5,
                             maxValue: 120,
                             interval: 10,
                             dialsize: 500,
                             segments: [
-                              DialSegmentNew('Extremely Low', 20, Colors.green),
+                              DialSegmentNew('Extremely Low', 15, Colors.green),
                               DialSegmentNew('Low', 30, Colors.blue),
                               DialSegmentNew('Good', 30, Colors.orange),
                               DialSegmentNew('High', 40, Colors.red),

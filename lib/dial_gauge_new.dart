@@ -338,7 +338,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
                               math.cos(math.pi /
                                   ((widget.maxValue - widget.minValue) /
                                       widget.interval) *
-                                  (i - startMarker) /
+                                  (i - widget.minValue) /
                                   widget.interval)),
                   widget.dialsize *
                       (0.475 -
@@ -346,7 +346,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
                               math.sin(math.pi /
                                   ((widget.maxValue - widget.minValue) /
                                       widget.interval) *
-                                  (i - startMarker) /
+                                  (i - widget.minValue) /
                                   widget.interval))),
               TextStyle(fontSize: widget.dialsize * 0.03))));
     }
