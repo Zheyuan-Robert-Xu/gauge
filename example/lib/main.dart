@@ -52,27 +52,6 @@ class _MyAppState extends State<MyApp> {
                             style: TextStyle(fontSize: 12)),
                       ),
                     ]),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     Container(
-                    //       child: PrettyDial(
-                    //         minValue: 0,
-                    //         maxValue: 150,
-                    //         dialsize: 500,
-                    //         segments: [
-                    //           DialSegment('Good', 40, Colors.green),
-                    //           DialSegment('Good', 30, Colors.blue),
-                    //           DialSegment('High', 80, Colors.red),
-                    //         ],
-                    //         currentValue: 90,
-                    //         showMarkers: true,
-                    //         displayWidget: const Text('Current Speed',
-                    //             style: TextStyle(fontSize: 16)),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -91,7 +70,7 @@ class _MyAppState extends State<MyApp> {
                             currentValue: 10,
                             showMarkers: true,
                             displayWidget: const Text('Current Speed',
-                                style: TextStyle(fontSize: 16)),
+                                style: TextStyle(fontSize: 9)),
                           ),
                         ),
                       ],

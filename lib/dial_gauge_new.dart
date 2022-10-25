@@ -54,7 +54,7 @@ class DialTickerNew extends CustomClipper<Path> {
   }
 
   @override
-  bool shouldReclip(DialNeedleClipperNew oldClipper) => false;
+  bool shouldReclip(DialTickerNew oldClipper) => false;
 }
 
 class ScaleTickerNew extends CustomClipper<Path> {
@@ -348,7 +348,8 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
                                       widget.interval) *
                                   (i - widget.minValue) /
                                   widget.interval))),
-              TextStyle(fontSize: widget.dialsize * 0.03))));
+              TextStyle(
+                  color: Colors.black, fontSize: widget.dialsize * 0.03))));
     }
     if ((widget.maxValue - widget.minValue) % widget.interval != 0) {
       containers.add(CustomPaint(
