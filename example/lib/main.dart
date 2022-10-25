@@ -88,7 +88,7 @@ class _MyAppState extends State<MyApp> {
                               DialSegmentNew('Good', 30, Colors.orange),
                               DialSegmentNew('High', 50, Colors.red),
                             ],
-                            currentValue: 120,
+                            currentValue: 10,
                             showMarkers: true,
                             displayWidget: const Text('Current Speed',
                                 style: TextStyle(fontSize: 16)),

@@ -306,7 +306,6 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
   List<Widget> buildTicker(List<DialSegmentNew> segments) {
     List<Container> containers = [];
     double cumulativeSegmentSize = 0.0;
-    double dialSpread = widget.maxValue - widget.minValue;
 
     //Iterate through the segments collection in reverse order
     //First paint the arc with the last segment color, then paint multiple arcs in sequence until we reach the first segment
@@ -427,7 +426,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
                                       widget.interval) *
                                   (i - startMarker) /
                                   widget.interval))),
-              widget.startMarkerStyle)));
+              TextStyle(fontSize: widget.dialsize * 0.03))));
     }
 
     return containers;
@@ -574,7 +573,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
                     widget.valueWidget ??
                         Text(
                             '${_currentValue.toStringAsFixed(_currentValueDecimalPlaces)}',
-                            style: const TextStyle(fontSize: 15)),
+                            style: TextStyle(fontSize: widget.dialsize * 0.04)),
                   ],
                 ),
               ),
