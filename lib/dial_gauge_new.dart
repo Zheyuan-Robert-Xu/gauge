@@ -281,7 +281,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
           child: Transform.rotate(
             origin: Offset(0, widget.dialsize / 4),
             angle: (math.pi * 3 / 2) +
-                ((i * widget.interval - widget.minValue) /
+                ((i * widget.interval) /
                     (widget.maxValue - widget.minValue) *
                     math.pi),
             child: ClipPath(
