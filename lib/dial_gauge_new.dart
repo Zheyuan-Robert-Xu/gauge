@@ -298,37 +298,6 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
       cumulativeSegmentSize = cumulativeSegmentSize + widget.interval;
     }
 
-    // segments.forEach((segment) {
-    //   int numberOfTicker = (segment.segmentSize / widget.interval).floor();
-    //   for (int i = 0; i < numberOfTicker; i++) {
-    //     containers.add(
-    //       Container(
-    //         height: widget.dialsize / 2,
-    //         width: widget.dialsize,
-    //         alignment: Alignment.center,
-    //         child: Transform.rotate(
-    //           origin: Offset(0, widget.dialsize / 4),
-    //           angle: (math.pi * 3 / 2) +
-    //               ((cumulativeSegmentSize +
-    //                       i * widget.interval -
-    //                       widget.minValue) /
-    //                   (widget.maxValue - widget.minValue) *
-    //                   math.pi),
-    //           child: ClipPath(
-    //             clipper: DialTickerNew(),
-    //             child: Container(
-    //               width: widget.dialsize * 0.75,
-    //               height: widget.dialsize,
-    //               color: segment.segmentColor,
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //     );
-    //   }
-    //   cumulativeSegmentSize = cumulativeSegmentSize + segment.segmentSize;
-    // });
-
     // add the last ticker
     containers.add(
       Container(
