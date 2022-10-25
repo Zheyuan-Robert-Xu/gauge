@@ -39,6 +39,26 @@ class DialNeedleClipperNew extends CustomClipper<Path> {
   bool shouldReclip(DialNeedleClipperNew oldClipper) => false;
 }
 
+class DialTickerNew extends CustomClipper<Path> {
+  //Note that x,y coordinate system starts at the bottom right of the canvas
+  //with x moving from right to left and y moving from bottm to top
+  //Bottom right is 0,0 and top left is x,y
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(size.width * 0.5, size.height * 0.24);
+    path.lineTo(1.05 * size.width * 0.5, size.height * 0.24);
+    path.lineTo(1.05 * size.width * 0.5, size.height * 0.1);
+    path.lineTo(size.width * 0.5, size.height * 0.1);
+    path.lineTo(size.width * 0.5, size.height * 0.24);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(DialNeedleClipperNew oldClipper) => false;
+}
+
 class ScaleClipperNew extends CustomClipper<Path> {
   //Note that x,y coordinate system starts at the bottom right of the canvas
   //with x moving from right to left and y moving from bottm to top
@@ -57,6 +77,26 @@ class ScaleClipperNew extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(ScaleClipperNew oldClipper) => false;
+}
+
+class ScaleTickerNew extends CustomClipper<Path> {
+  //Note that x,y coordinate system starts at the bottom right of the canvas
+  //with x moving from right to left and y moving from bottm to top
+  //Bottom right is 0,0 and top left is x,y
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(0.975 * size.width * 0.1, size.height * 0.875);
+    path.lineTo(1.2 * size.width * 0.1, size.height * 0.875);
+    path.lineTo(1.2 * size.width * 0.1, size.height * 0.91);
+    path.lineTo(0.95 * size.width * 0.1, size.height * 0.91);
+    path.lineTo(0.95 * size.width * 0.1, size.height * 0.875);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(ScaleTickerNew oldClipper) => false;
 }
 
 class ArcPainterNew extends CustomPainter {
@@ -187,6 +227,9 @@ class PrettyDialNew extends StatefulWidget {
   ///Custom color for the needle on the Dial. Defaults to Colors.black
   final Color needleColor;
 
+  ///Custom color for the needle on the Dial. Defaults to Colors.black
+  final Color tickerColor;
+
   ///The default Segment color. Defaults to Colors.grey
   final Color defaultSegmentColor;
 
@@ -219,6 +262,7 @@ class PrettyDialNew extends StatefulWidget {
       this.currentValue,
       this.currentValueDecimalPlaces = 1,
       this.needleColor = Colors.black,
+      this.tickerColor = Colors.orange,
       this.defaultSegmentColor = Colors.grey,
       this.valueWidget,
       this.displayWidget,
@@ -259,6 +303,71 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     return arcs;
   }
 
+  List<Widget> buildTicker(List<DialSegmentNew> segments) {
+    List<Container> containers = [];
+    double cumulativeSegmentSize = 0.0;
+    double dialSpread = widget.maxValue - widget.minValue;
+
+    //Iterate through the segments collection in reverse order
+    //First paint the arc with the last segment color, then paint multiple arcs in sequence until we reach the first segment
+
+    //Because all these arcs will be painted inside of a Stack, it will overlay to represent the eventual Dial with
+    //multiple segments
+    segments.forEach((segment) {
+      int numberOfTicker = (segment.segmentSize / widget.interval).floor();
+      for (int i = 0; i < numberOfTicker; i++) {
+        containers.add(
+          Container(
+            height: widget.dialsize / 2,
+            width: widget.dialsize,
+            alignment: Alignment.center,
+            child: Transform.rotate(
+              origin: Offset(0, widget.dialsize / 4),
+              angle: (math.pi * 3 / 2) +
+                  ((cumulativeSegmentSize +
+                          i * widget.interval -
+                          widget.minValue) /
+                      (widget.maxValue - widget.minValue) *
+                      math.pi),
+              child: ClipPath(
+                clipper: DialTickerNew(),
+                child: Container(
+                  width: widget.dialsize * 0.75,
+                  height: widget.dialsize,
+                  color: segment.segmentColor,
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      cumulativeSegmentSize = cumulativeSegmentSize + segment.segmentSize;
+    });
+
+    // add the last ticker
+    containers.add(
+      Container(
+        height: widget.dialsize / 2,
+        width: widget.dialsize,
+        alignment: Alignment.center,
+        child: Transform.rotate(
+          origin: Offset(0, widget.dialsize / 4),
+          angle: (math.pi * 3 / 2) + math.pi * 0.985,
+          child: ClipPath(
+            clipper: DialTickerNew(),
+            child: Container(
+              width: widget.dialsize * 0.75,
+              height: widget.dialsize,
+              color: segments[segments.length - 1].segmentColor,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return containers;
+  }
+
   List<Widget> buildMarker(List<DialSegmentNew> segments) {
     List<Container> containers = [];
     double cumulativeSegmentSize = 0.0;
@@ -271,21 +380,15 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     segments.asMap().forEach((index, value) {
       containers.add(
         Container(
-          height: widget.dialsize / 2,
+          height: widget.dialsize,
           width: widget.dialsize,
           alignment: Alignment.center,
-          child: Transform.rotate(
-            angle: (math.pi / 2) +
-                cumulativeSegmentSize /
-                    (widget.maxValue - widget.minValue) *
-                    math.pi,
-            child: ClipPath(
-              clipper: ScaleClipperNew(),
-              child: Container(
-                width: widget.dialsize * 0.25,
-                height: widget.dialsize * 1.1,
-                color: Colors.orange,
-              ),
+          child: ClipPath(
+            clipper: ScaleTickerNew(),
+            child: Container(
+              width: widget.dialsize,
+              height: widget.dialsize,
+              color: widget.tickerColor,
             ),
           ),
         ),
@@ -330,37 +433,6 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     return containers;
   }
 
-  List<Widget> buildDigitalDial(List<DialSegmentNew> segments) {
-    List<Container> containers = [];
-    double cumulativeSegmentSize = 0.0;
-
-    segments.reversed.toList().asMap().forEach((index, value) {
-      if (index != segments.length - 1) {
-        containers.add(
-          Container(
-            child: Transform.rotate(
-              origin: Offset(0, widget.dialsize),
-              // add 1 in angle to improve the layout
-              angle: -math.pi / 2 +
-                  math.pi *
-                      (cumulativeSegmentSize + value.segmentSize) /
-                      (widget.maxValue - widget.minValue),
-              child: CustomPaint(
-                  size: Size(widget.dialsize, widget.dialsize / 2),
-                  painter: DialMarkerPainterNew(
-                      (cumulativeSegmentSize + value.segmentSize).toString(),
-                      Offset(0, 0),
-                      widget.startMarkerStyle)),
-            ),
-          ),
-        );
-      }
-
-      cumulativeSegmentSize = cumulativeSegmentSize + value.segmentSize;
-    });
-    return containers;
-  }
-
   List<Widget> buildScaleMarker(List<DialSegmentNew> segments) {
     List<CustomPaint> arcs = [];
     double cumulativeSegmentSize = 0.0;
@@ -391,6 +463,35 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     });
 
     return arcs;
+  }
+
+  List<Widget> buildLegends(List<DialSegmentNew> segments) {
+    List<Widget> widgets = [];
+    segments.asMap().forEach((index, segment) {
+      widgets.add(
+        Row(
+          children: [
+            Container(
+              height: widget.dialsize * 0.03,
+              width: widget.dialsize * 0.07,
+              color: segment.segmentColor,
+            ),
+            SizedBox(
+              width: widget.dialsize * 0.02,
+            ),
+            Text(
+              segment.segmentName,
+              style: TextStyle(fontSize: widget.dialsize * 0.03),
+            )
+          ],
+        ),
+      );
+      widgets.add(SizedBox(
+        height: widget.dialsize * 0.01,
+      ));
+    });
+
+    return widgets;
   }
 
   @override
@@ -430,108 +531,66 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
       ];
     }
 
-    return SizedBox(
-      height: widget.dialsize * 0.55,
-      width: widget.dialsize,
-      child: Stack(
-        children: <Widget>[
-          ...buildDial(_segments),
-          ...buildMarker(_segments),
-
-          // marker bar for intermediate value
-          Container(
-            height: widget.dialsize / 2,
-            width: widget.dialsize,
-            alignment: Alignment.center,
-            child: Transform.rotate(
-              angle: (math.pi / 2),
-              child: ClipPath(
-                clipper: ScaleClipperNew(),
-                child: Container(
-                  width: widget.dialsize * 0.25,
-                  height: widget.dialsize * 1.1,
-                  color: Colors.orange,
+    return Row(
+      children: [
+        SizedBox(
+          height: widget.dialsize * 0.55,
+          width: widget.dialsize,
+          child: Stack(
+            children: <Widget>[
+              ...buildTicker(_segments),
+              ...buildDial(_segments),
+              Container(
+                height: widget.dialsize / 2,
+                width: widget.dialsize,
+                alignment: Alignment.center,
+                child: Transform.rotate(
+                  origin: Offset(0, widget.dialsize / 4),
+                  angle: (math.pi * 3 / 2) +
+                      ((_currentValue! - widget.minValue) /
+                          (widget.maxValue - widget.minValue) *
+                          math.pi),
+                  child: ClipPath(
+                    clipper: DialNeedleClipperNew(),
+                    child: Container(
+                      width: widget.dialsize * 0.75,
+                      height: widget.dialsize,
+                      color: widget.needleColor,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-
-          // marker bar for minimal value
-          Container(
-            height: widget.dialsize / 2,
-            width: widget.dialsize,
-            alignment: Alignment.center,
-            child: Transform.rotate(
-              angle: (math.pi / 2),
-              child: ClipPath(
-                clipper: ScaleClipperNew(),
-                child: Container(
-                  width: widget.dialsize * 0.25,
-                  height: widget.dialsize * 1.1,
-                  color: Colors.orange,
+              Container(
+                height: widget.dialsize,
+                width: widget.dialsize,
+                alignment: Alignment.bottomCenter,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      height: widget.dialsize * 0.44,
+                    ),
+                    widget.displayWidget ?? Container(),
+                    widget.valueWidget ??
+                        Text(
+                            '${_currentValue.toStringAsFixed(_currentValueDecimalPlaces)}',
+                            style: const TextStyle(fontSize: 15)),
+                  ],
                 ),
               ),
-            ),
+              ...buildScalerMarker(0, 150),
+            ],
           ),
-
-          // marker bar for max value
-          Container(
-            height: widget.dialsize / 2,
-            width: widget.dialsize,
-            alignment: Alignment.center,
-            child: Transform.rotate(
-              angle: (3 * math.pi / 2),
-              child: ClipPath(
-                clipper: ScaleClipperNew(),
-                child: Container(
-                  width: widget.dialsize * 0.25,
-                  height: widget.dialsize * 1.1,
-                  color: Colors.orange,
-                ),
-              ),
-            ),
-          ),
-          Container(
-            height: widget.dialsize / 2,
-            width: widget.dialsize,
-            alignment: Alignment.center,
-            child: Transform.rotate(
-              origin: Offset(0, widget.dialsize / 4),
-              angle: (math.pi * 3 / 2) +
-                  ((_currentValue! - widget.minValue) /
-                      (widget.maxValue - widget.minValue) *
-                      math.pi),
-              child: ClipPath(
-                clipper: DialNeedleClipperNew(),
-                child: Container(
-                  width: widget.dialsize * 0.75,
-                  height: widget.dialsize,
-                  color: widget.needleColor,
-                ),
-              ),
-            ),
-          ),
-          Container(
-            height: widget.dialsize,
-            width: widget.dialsize,
-            alignment: Alignment.bottomCenter,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                SizedBox(
-                  height: widget.dialsize * 0.44,
-                ),
-                widget.displayWidget ?? Container(),
-                widget.valueWidget ??
-                    Text(
-                        '${_currentValue.toStringAsFixed(_currentValueDecimalPlaces)}',
-                        style: const TextStyle(fontSize: 15)),
-              ],
-            ),
-          ),
-          ...buildScalerMarker(0, 150),
-        ],
-      ),
+        ),
+        SizedBox(
+          width: widget.dialsize / 8,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [...buildLegends(_segments)],
+        ),
+      ],
     );
   }
 }
