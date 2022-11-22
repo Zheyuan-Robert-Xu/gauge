@@ -57,20 +57,37 @@ class _MyAppState extends State<MyApp> {
                       children: [
                         Container(
                           child: PrettyDialNew(
-                            minValue: 5,
+                            minValue: 0,
                             maxValue: 120,
+                            isTickerShowDouble: false,
                             interval: 10,
                             dialsize: 500,
                             segments: [
-                              DialSegmentNew('Extremely Low', 15, Colors.green),
-                              DialSegmentNew('Low', 30, Colors.blue),
-                              DialSegmentNew('Good', 30, Colors.orange),
-                              DialSegmentNew('High', 40, Colors.red),
+                              DialSegmentNew(
+                                  'Extremely Low',
+                                  20,
+                                  Color.fromARGB(255, 159, 230, 73),
+                                  Color.fromARGB(255, 230, 230, 73)),
+                              DialSegmentNew(
+                                  'Low',
+                                  30,
+                                  Color.fromARGB(255, 230, 230, 73),
+                                  Color.fromARGB(255, 230, 183, 73)),
+                              DialSegmentNew(
+                                  'Good',
+                                  30,
+                                  Color.fromARGB(255, 230, 183, 73),
+                                  Color.fromARGB(255, 230, 136, 73)),
+                              DialSegmentNew(
+                                  'High',
+                                  40,
+                                  Color.fromARGB(255, 230, 136, 73),
+                                  Color.fromARGB(255, 230, 73, 73)),
                             ],
                             currentValue: 10,
                             showMarkers: true,
                             displayWidget: const Text('Current Speed',
-                                style: TextStyle(fontSize: 9)),
+                                style: TextStyle(fontSize: 16)),
                           ),
                         ),
                       ],

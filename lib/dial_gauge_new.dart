@@ -2,6 +2,7 @@ library pretty_Dial_new;
 
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 
 ///Class that holds the details of each segment on a CustomDial
 class DialSegmentNew {
@@ -11,11 +12,13 @@ class DialSegmentNew {
   final double segmentSize;
 
   ///The size of the segment
-  final Color segmentColor;
+  final Color segmentFirstColor;
+  final Color segmentLastColor;
 
   ///The color of the segment
 
-  DialSegmentNew(this.segmentName, this.segmentSize, this.segmentColor);
+  DialSegmentNew(this.segmentName, this.segmentSize, this.segmentFirstColor,
+      this.segmentLastColor);
 }
 
 class DialNeedleClipperNew extends CustomClipper<Path> {
@@ -79,13 +82,18 @@ class ScaleTickerNew extends CustomClipper<Path> {
 
 class ArcPainterNew extends CustomPainter {
   ArcPainterNew(
-      {this.startAngle = 0, this.sweepAngle = 0, this.color = Colors.grey});
+      {this.startAngle = 0,
+      this.sweepAngle = 0,
+      this.firstColor = Colors.grey,
+      this.lastColor = Colors.grey});
 
   final double startAngle;
 
   final double sweepAngle;
 
-  final Color color;
+  final Color firstColor;
+
+  final Color lastColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -98,7 +106,12 @@ class ArcPainterNew extends CustomPainter {
     const useCenter = false;
 
     final paint = Paint()
-      ..color = color
+      ..shader = ui.Gradient.linear(rect.centerLeft, rect.centerRight, [
+        firstColor,
+        lastColor,
+        // firstColor,
+        // secondColor
+      ])
       ..style = PaintingStyle.stroke
       ..strokeWidth = size.width * 0.2;
 
@@ -163,6 +176,9 @@ class PrettyDialNew extends StatefulWidget {
   /// value of interval between two markers
   final int interval;
 
+  /// whether to show double for the value of interval
+  final bool isTickerShowDouble;
+
   ///Current value of the Dial
   final double? currentValue;
 
@@ -204,6 +220,7 @@ class PrettyDialNew extends StatefulWidget {
       this.minValue = 0.0,
       this.maxValue = 100.0,
       this.interval = 10,
+      this.isTickerShowDouble = false,
       this.currentValue,
       this.currentValueDecimalPlaces = 1,
       this.needleColor = Colors.black,
@@ -239,7 +256,8 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
               startAngle: math.pi,
               sweepAngle:
                   ((dialSpread - cumulativeSegmentSize) / dialSpread) * math.pi,
-              color: segment.segmentColor),
+              firstColor: segments.first.segmentFirstColor,
+              lastColor: segments.last.segmentLastColor),
         ),
       );
       cumulativeSegmentSize = cumulativeSegmentSize + segment.segmentSize;
@@ -289,7 +307,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
               child: Container(
                 width: widget.dialsize * 0.75,
                 height: widget.dialsize,
-                color: segments[indexOfSegment].segmentColor,
+                color: segments[indexOfSegment].segmentFirstColor,
               ),
             ),
           ),
@@ -312,7 +330,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
             child: Container(
               width: widget.dialsize * 0.75,
               height: widget.dialsize,
-              color: segments[segments.length - 1].segmentColor,
+              color: segments[segments.length - 1].segmentFirstColor,
             ),
           ),
         ),
@@ -324,13 +342,12 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
 
   List<Widget> buildScalerMarker(double minValue, double maxValue) {
     List<Widget> containers = [];
-    int startMarker = (minValue / widget.interval).floor() * widget.interval;
 
     for (double i = minValue; i <= maxValue; i += widget.interval) {
       containers.add(CustomPaint(
           size: Size(widget.dialsize, widget.dialsize),
           painter: DialMarkerPainterNew(
-              i.toString(),
+              widget.isTickerShowDouble ? i.toString() : i.toInt().toString(),
               Offset(
                   widget.dialsize *
                       (0.475 -
@@ -355,44 +372,15 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
       containers.add(CustomPaint(
           size: Size(widget.dialsize, widget.dialsize),
           painter: DialMarkerPainterNew(
-              widget.maxValue.toString(),
+              widget.isTickerShowDouble
+                  ? widget.maxValue.toString()
+                  : widget.maxValue.toInt().toString(),
               Offset(widget.dialsize * 0.825, widget.dialsize * 0.475),
-              TextStyle(fontSize: widget.dialsize * 0.03))));
+              TextStyle(
+                  color: Colors.black, fontSize: widget.dialsize * 0.03))));
     }
 
     return containers;
-  }
-
-  List<Widget> buildScaleMarker(List<DialSegmentNew> segments) {
-    List<CustomPaint> arcs = [];
-    double cumulativeSegmentSize = 0.0;
-    double dialSpread = widget.maxValue - widget.minValue;
-
-    //Iterate through the segments collection in reverse order
-    //First paint the arc with the last segment color, then paint multiple arcs in sequence until we reach the first segment
-
-    //Because all these arcs will be painted inside of a Stack, it will overlay to represent the eventual Dial with
-    //multiple segments
-    // segments.asMap().entries.map((entry) {
-    //   int idx = entry.key;
-    //   DialSegmentNew segment = entry.value;
-
-    // });
-    segments.reversed.forEach((segment) {
-      arcs.add(
-        CustomPaint(
-          size: Size(widget.dialsize, widget.dialsize),
-          painter: ArcPainterNew(
-              startAngle: math.pi,
-              sweepAngle:
-                  ((dialSpread - cumulativeSegmentSize) / dialSpread) * math.pi,
-              color: segment.segmentColor),
-        ),
-      );
-      cumulativeSegmentSize = cumulativeSegmentSize + segment.segmentSize;
-    });
-
-    return arcs;
   }
 
   List<Widget> buildLegends(List<DialSegmentNew> segments) {
@@ -402,9 +390,18 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
         Row(
           children: [
             Container(
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  segment.segmentFirstColor,
+                  segment.segmentLastColor,
+                ],
+              )),
               height: widget.dialsize * 0.03,
               width: widget.dialsize * 0.07,
-              color: segment.segmentColor,
+              // color: segment.segmentColor,
             ),
             SizedBox(
               width: widget.dialsize * 0.02,
@@ -456,8 +453,8 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     } else {
       //If no segments are supplied, default to one segment with default color
       _segments = [
-        DialSegmentNew(
-            '', (widget.maxValue - widget.minValue), widget.defaultSegmentColor)
+        DialSegmentNew('', (widget.maxValue - widget.minValue),
+            widget.defaultSegmentColor, widget.defaultSegmentColor)
       ];
     }
 
