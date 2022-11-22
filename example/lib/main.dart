@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pretty_gauge/pretty_gauge.dart';
-import 'package:pretty_gauge/dial_gauge.dart';
 import 'package:pretty_gauge/dial_gauge_new.dart';
 
 void main() => runApp(const MyApp());
@@ -62,26 +61,30 @@ class _MyAppState extends State<MyApp> {
                             isTickerShowDouble: false,
                             interval: 10,
                             dialsize: 500,
+                            firstSegmentColor:
+                                Color.fromARGB(255, 159, 230, 73),
+                            lastSegmentColor: Color.fromARGB(255, 230, 73, 73),
                             segments: [
+                              // currently manually set the value of color in segments
                               DialSegmentNew(
                                   'Extremely Low',
                                   20,
                                   Color.fromARGB(255, 159, 230, 73),
-                                  Color.fromARGB(255, 230, 230, 73)),
+                                  Color.fromARGB(255, 170, 203, 73)),
                               DialSegmentNew(
                                   'Low',
                                   30,
-                                  Color.fromARGB(255, 230, 230, 73),
-                                  Color.fromARGB(255, 230, 183, 73)),
+                                  Color.fromARGB(255, 170, 203, 73),
+                                  Color.fromARGB(255, 188, 164, 73)),
                               DialSegmentNew(
                                   'Good',
                                   30,
-                                  Color.fromARGB(255, 230, 183, 73),
-                                  Color.fromARGB(255, 230, 136, 73)),
+                                  Color.fromARGB(255, 188, 164, 73),
+                                  Color.fromARGB(255, 206, 125, 73)),
                               DialSegmentNew(
                                   'High',
                                   40,
-                                  Color.fromARGB(255, 230, 136, 73),
+                                  Color.fromARGB(255, 206, 125, 73),
                                   Color.fromARGB(255, 230, 73, 73)),
                             ],
                             currentValue: 10,

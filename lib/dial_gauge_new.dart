@@ -194,6 +194,12 @@ class PrettyDialNew extends StatefulWidget {
   ///The default Segment color. Defaults to Colors.grey
   final Color defaultSegmentColor;
 
+  ///The default Segment color. Defaults to Colors.grey
+  final Color firstSegmentColor;
+
+  ///The default Segment color. Defaults to Colors.grey
+  final Color lastSegmentColor;
+
   ///Widget that is used to show the current value on the Dial. Defaults to show the current value as a Decimal with 1 digit
   ///If value must not be shown, supply Container()
   final Widget? valueWidget;
@@ -226,6 +232,8 @@ class PrettyDialNew extends StatefulWidget {
       this.needleColor = Colors.black,
       this.tickerColor = Colors.orange,
       this.defaultSegmentColor = Colors.grey,
+      this.firstSegmentColor = Colors.grey,
+      this.lastSegmentColor = Colors.grey,
       this.valueWidget,
       this.displayWidget,
       this.showMarkers = true,
@@ -350,16 +358,16 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
               widget.isTickerShowDouble ? i.toString() : i.toInt().toString(),
               Offset(
                   widget.dialsize *
-                      (0.475 -
-                          0.35 *
+                      (0.48 -
+                          0.65 *
                               math.cos(math.pi /
                                   ((widget.maxValue - widget.minValue) /
                                       widget.interval) *
                                   (i - widget.minValue) /
                                   widget.interval)),
                   widget.dialsize *
-                      (0.475 -
-                          0.35 *
+                      (0.48 -
+                          0.65 *
                               math.sin(math.pi /
                                   ((widget.maxValue - widget.minValue) /
                                       widget.interval) *
@@ -510,7 +518,7 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
           ),
         ),
         SizedBox(
-          width: widget.dialsize / 8,
+          width: widget.dialsize / 4,
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
