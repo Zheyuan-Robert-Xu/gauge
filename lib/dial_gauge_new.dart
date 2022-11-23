@@ -61,26 +61,6 @@ class DialTickerNew extends CustomClipper<Path> {
   bool shouldReclip(DialTickerNew oldClipper) => false;
 }
 
-class ScaleTickerNew extends CustomClipper<Path> {
-  //Note that x,y coordinate system starts at the bottom right of the canvas
-  //with x moving from right to left and y moving from bottm to top
-  //Bottom right is 0,0 and top left is x,y
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    path.moveTo(0.975 * size.width * 0.1, size.height * 0.875);
-    path.lineTo(1.2 * size.width * 0.1, size.height * 0.875);
-    path.lineTo(1.2 * size.width * 0.1, size.height * 0.91);
-    path.lineTo(0.95 * size.width * 0.1, size.height * 0.91);
-    path.lineTo(0.95 * size.width * 0.1, size.height * 0.875);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(ScaleTickerNew oldClipper) => false;
-}
-
 class ArcPainterNew extends CustomPainter {
   ArcPainterNew(
       {this.startAngle = 0,
@@ -389,160 +369,6 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     return containers;
   }
 
-  // List<Widget> buildScalerMarker(double minValue, double maxValue) {
-  //   List<Widget> containers = [];
-
-  //   for (double i = minValue; i <= maxValue; i += widget.interval) {
-  //     containers.add(CustomPaint(
-  //         size: Size(widget.dialsize, widget.dialsize),
-  //         painter: DialMarkerPainterNew(
-  //             widget.isTickerShowDouble ? i.toString() : i.toInt().toString(),
-  //             Offset(
-  //                 widget.dialsize *
-  //                     (0.48 -
-  //                         0.65 *
-  //                             math.cos(math.pi /
-  //                                 ((widget.maxValue - widget.minValue) /
-  //                                     widget.interval) *
-  //                                 (i - widget.minValue) /
-  //                                 widget.interval)),
-  //                 widget.dialsize *
-  //                     (0.48 -
-  //                         0.65 *
-  //                             math.sin(math.pi /
-  //                                 ((widget.maxValue - widget.minValue) /
-  //                                     widget.interval) *
-  //                                 (i - widget.minValue) /
-  //                                 widget.interval))),
-  //             TextStyle(
-  //                 color: Colors.black, fontSize: widget.dialsize * 0.03))));
-  //   }
-  //   if ((widget.maxValue - widget.minValue) % widget.interval != 0) {
-  //     containers.add(CustomPaint(
-  //         size: Size(widget.dialsize, widget.dialsize),
-  //         painter: DialMarkerPainterNew(
-  //             widget.isTickerShowDouble
-  //                 ? widget.maxValue.toString()
-  //                 : widget.maxValue.toInt().toString(),
-  //             Offset(widget.dialsize * 0.825, widget.dialsize * 0.475),
-  //             TextStyle(
-  //                 color: Colors.black, fontSize: widget.dialsize * 0.03))));
-  //   }
-
-  //   return containers;
-  // }
-
-  List<Widget> buildInnerTicker(List<DialSegmentNew> segments) {
-    List<Container> containers = [];
-    double cumulativeSegmentSize = 0.0;
-
-    int numberOfTicker =
-        ((widget.maxValue - widget.minValue) / widget.interval).floor();
-    for (int i = 0; i < numberOfTicker; i++) {
-      int indexOfSegment = 0;
-      double currentCumulativeValue = 0;
-      for (int segmentIndex = 0;
-          segmentIndex < segments.length;
-          segmentIndex++) {
-        currentCumulativeValue += segments[segmentIndex].segmentSize;
-        if (i * widget.interval >= currentCumulativeValue) {
-          if (segmentIndex < segments.length - 1) {
-            indexOfSegment = segmentIndex + 1;
-          }
-        }
-      }
-      containers.add(
-        Container(
-          height: widget.dialsize / 2,
-          width: widget.dialsize,
-          alignment: Alignment.center,
-          child: Transform.rotate(
-            origin: Offset(0, widget.dialsize / 4),
-            angle: (math.pi * 3 / 2) +
-                ((i * widget.interval) /
-                    (widget.maxValue - widget.minValue) *
-                    math.pi),
-            child: ClipPath(
-              clipper: DialTickerNew(),
-              child: Container(
-                width: widget.dialsize * 0.5,
-                height: widget.dialsize,
-                color: segments[indexOfSegment].segmentFirstColor,
-              ),
-            ),
-          ),
-        ),
-      );
-      cumulativeSegmentSize = cumulativeSegmentSize + widget.interval;
-    }
-
-    // add the last ticker
-    containers.add(
-      Container(
-        height: widget.dialsize / 2,
-        width: widget.dialsize,
-        alignment: Alignment.center,
-        child: Transform.rotate(
-          origin: Offset(0, widget.dialsize / 4),
-          angle: (math.pi * 3 / 2) + math.pi * 0.99,
-          child: ClipPath(
-            clipper: DialTickerNew(),
-            child: Container(
-              width: widget.dialsize * 0.5,
-              height: widget.dialsize,
-              color: segments[segments.length - 1].segmentLastColor,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    return containers;
-  }
-
-  List<Widget> buildScalerTicker(double minValue, double maxValue) {
-    List<Widget> containers = [];
-
-    for (double i = minValue; i <= maxValue; i += widget.interval) {
-      containers.add(CustomPaint(
-          size: Size(widget.dialsize, widget.dialsize),
-          painter: DialMarkerPainterNew(
-              widget.isTickerShowDouble ? i.toString() : i.toInt().toString(),
-              Offset(
-                  widget.dialsize *
-                      (0.48 -
-                          0.65 *
-                              math.cos(math.pi /
-                                  ((widget.maxValue - widget.minValue) /
-                                      widget.interval) *
-                                  (i - widget.minValue) /
-                                  widget.interval)),
-                  widget.dialsize *
-                      (0.48 -
-                          0.65 *
-                              math.sin(math.pi /
-                                  ((widget.maxValue - widget.minValue) /
-                                      widget.interval) *
-                                  (i - widget.minValue) /
-                                  widget.interval))),
-              TextStyle(
-                  color: Colors.black, fontSize: widget.dialsize * 0.03))));
-    }
-    if ((widget.maxValue - widget.minValue) % widget.interval != 0) {
-      containers.add(CustomPaint(
-          size: Size(widget.dialsize, widget.dialsize),
-          painter: DialMarkerPainterNew(
-              widget.isTickerShowDouble
-                  ? widget.maxValue.toString()
-                  : widget.maxValue.toInt().toString(),
-              Offset(widget.dialsize * 0.825, widget.dialsize * 0.475),
-              TextStyle(
-                  color: Colors.black, fontSize: widget.dialsize * 0.03))));
-    }
-
-    return containers;
-  }
-
   List<Widget> buildScalerMarker(double minValue, double maxValue) {
     List<Widget> containers = [];
 
@@ -668,8 +494,6 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
           width: widget.dialsize,
           child: Stack(
             children: <Widget>[
-              // ...buildInnerTicker(_segments),
-              // ...buildOuterTicker(_segments),
               ...buildDial(_segments),
               ...buildSmallDial(_segments),
               Container(
