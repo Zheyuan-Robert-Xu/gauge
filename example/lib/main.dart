@@ -59,7 +59,7 @@ class _MyAppState extends State<MyApp> {
                                   Color.fromARGB(255, 206, 125, 73),
                                   Color.fromARGB(255, 230, 73, 73)),
                             ],
-                            currentValue: 0,
+                            currentValue: 90,
                             showMarkers: true,
                             displayWidget: const Text('Current Speed',
                                 style: TextStyle(fontSize: 16)),
