@@ -47,11 +47,12 @@ class DialTickerNew extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
-    path.moveTo(size.width * 0.5, size.height * 0.24);
-    path.lineTo(1.05 * size.width * 0.5, size.height * 0.24);
-    path.lineTo(1.05 * size.width * 0.5, size.height * 0.1);
-    path.lineTo(size.width * 0.5, size.height * 0.1);
-    path.lineTo(size.width * 0.5, size.height * 0.24);
+
+    path.lineTo(size.width * 0.95, size.height * 0.13); // top left
+    path.lineTo(size.width * 0.9, size.height * 0.2); // top left
+    path.lineTo(size.width * 1, size.height * 0.19); // top left
+    path.lineTo(size.width * 0.95, size.height * 0.13); // top left
+
     path.close();
     return path;
   }
@@ -274,15 +275,166 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
     return arcs;
   }
 
-  List<Widget> buildTicker(List<DialSegmentNew> segments) {
-    List<Container> containers = [];
+  List<Widget> buildSmallDial(List<DialSegmentNew> segments) {
+    List<CustomPaint> arcs = [];
     double cumulativeSegmentSize = 0.0;
+    double dialSpread = widget.maxValue - widget.minValue;
 
     //Iterate through the segments collection in reverse order
     //First paint the arc with the last segment color, then paint multiple arcs in sequence until we reach the first segment
 
     //Because all these arcs will be painted inside of a Stack, it will overlay to represent the eventual Dial with
     //multiple segments
+    segments.forEach((segment) {
+      arcs.add(
+        CustomPaint(
+          size: Size(widget.dialsize, widget.dialsize / 2),
+          painter: ArcPainterNew(
+            startAngle: math.pi * (1 + cumulativeSegmentSize / (dialSpread)) -
+                0.003 * math.pi,
+            sweepAngle: 0.006 * math.pi,
+            // firstColor: segments.first.segmentLastColor,
+            // lastColor: segments.last.segmentLastColor,
+            firstColor: Colors.white70,
+            lastColor: Colors.white70,
+          ),
+        ),
+      );
+      cumulativeSegmentSize = cumulativeSegmentSize + segment.segmentSize;
+    });
+
+    arcs.add(
+      CustomPaint(
+        size: Size(widget.dialsize, widget.dialsize / 2),
+        painter: ArcPainterNew(
+          startAngle: math.pi * 2 - 0.003 * math.pi,
+          sweepAngle: 0.006 * math.pi,
+          // firstColor: segments.first.segmentLastColor,
+          // lastColor: segments.last.segmentLastColor,
+          firstColor: Colors.white70,
+          lastColor: Colors.white70,
+        ),
+      ),
+    );
+
+    return arcs;
+  }
+
+  // new builder for the Ticker
+  List<Widget> buildOuterTicker(List<DialSegmentNew> segments) {
+    List<Container> containers = [];
+    double cumulativeSegmentSize = 0.0;
+
+    int numberOfTicker =
+        ((widget.maxValue - widget.minValue) / widget.interval).floor();
+    for (int i = 0; i < numberOfTicker; i++) {
+      int indexOfSegment = 0;
+      double currentCumulativeValue = 0;
+      for (int segmentIndex = 0;
+          segmentIndex < segments.length;
+          segmentIndex++) {
+        currentCumulativeValue += segments[segmentIndex].segmentSize;
+        if (i * widget.interval >= currentCumulativeValue) {
+          if (segmentIndex < segments.length - 1) {
+            indexOfSegment = segmentIndex + 1;
+          }
+        }
+      }
+      containers.add(
+        Container(
+          height: widget.dialsize,
+          width: widget.dialsize,
+          alignment: Alignment.center,
+          child: Transform.rotate(
+            origin: Offset(0, widget.dialsize * 0.25),
+            angle: (math.pi * 1.25) +
+                ((i * widget.interval) /
+                    (widget.maxValue - widget.minValue) *
+                    math.pi),
+            child: ClipPath(
+              clipper: DialTickerNew(),
+              child: Container(
+                width: widget.dialsize,
+                height: widget.dialsize,
+                color: segments[indexOfSegment].segmentFirstColor,
+              ),
+            ),
+          ),
+        ),
+      );
+      cumulativeSegmentSize = cumulativeSegmentSize + widget.interval;
+    }
+
+    // add the last ticker
+    containers.add(
+      Container(
+        height: widget.dialsize / 2,
+        width: widget.dialsize,
+        alignment: Alignment.center,
+        child: Transform.rotate(
+          origin: Offset(0, widget.dialsize / 4),
+          angle: (math.pi * 3 / 2) + math.pi * 0.99,
+          child: ClipPath(
+            clipper: DialTickerNew(),
+            child: Container(
+              width: widget.dialsize * 0.5,
+              height: widget.dialsize,
+              color: segments[segments.length - 1].segmentLastColor,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return containers;
+  }
+
+  // List<Widget> buildScalerMarker(double minValue, double maxValue) {
+  //   List<Widget> containers = [];
+
+  //   for (double i = minValue; i <= maxValue; i += widget.interval) {
+  //     containers.add(CustomPaint(
+  //         size: Size(widget.dialsize, widget.dialsize),
+  //         painter: DialMarkerPainterNew(
+  //             widget.isTickerShowDouble ? i.toString() : i.toInt().toString(),
+  //             Offset(
+  //                 widget.dialsize *
+  //                     (0.48 -
+  //                         0.65 *
+  //                             math.cos(math.pi /
+  //                                 ((widget.maxValue - widget.minValue) /
+  //                                     widget.interval) *
+  //                                 (i - widget.minValue) /
+  //                                 widget.interval)),
+  //                 widget.dialsize *
+  //                     (0.48 -
+  //                         0.65 *
+  //                             math.sin(math.pi /
+  //                                 ((widget.maxValue - widget.minValue) /
+  //                                     widget.interval) *
+  //                                 (i - widget.minValue) /
+  //                                 widget.interval))),
+  //             TextStyle(
+  //                 color: Colors.black, fontSize: widget.dialsize * 0.03))));
+  //   }
+  //   if ((widget.maxValue - widget.minValue) % widget.interval != 0) {
+  //     containers.add(CustomPaint(
+  //         size: Size(widget.dialsize, widget.dialsize),
+  //         painter: DialMarkerPainterNew(
+  //             widget.isTickerShowDouble
+  //                 ? widget.maxValue.toString()
+  //                 : widget.maxValue.toInt().toString(),
+  //             Offset(widget.dialsize * 0.825, widget.dialsize * 0.475),
+  //             TextStyle(
+  //                 color: Colors.black, fontSize: widget.dialsize * 0.03))));
+  //   }
+
+  //   return containers;
+  // }
+
+  List<Widget> buildInnerTicker(List<DialSegmentNew> segments) {
+    List<Container> containers = [];
+    double cumulativeSegmentSize = 0.0;
 
     int numberOfTicker =
         ((widget.maxValue - widget.minValue) / widget.interval).floor();
@@ -516,8 +668,10 @@ class _PrettyDialNewState extends State<PrettyDialNew> {
           width: widget.dialsize,
           child: Stack(
             children: <Widget>[
-              ...buildTicker(_segments),
+              // ...buildInnerTicker(_segments),
+              // ...buildOuterTicker(_segments),
               ...buildDial(_segments),
+              ...buildSmallDial(_segments),
               Container(
                 height: widget.dialsize / 2,
                 width: widget.dialsize,
